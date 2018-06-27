@@ -76,25 +76,20 @@ class ForstaBot {
         }
 
         const msgValue = msg.data.body[0].value;
-        const setLanguage = [msgValue.substring(0, 12), msgValue.substring(13, 15)];
+        const setLanguage = msgValue.substring(13, 15);
         const msgSenderId = msg.sender.userId;
         const preferredLanguage = await relay.storage.get(msgSenderId, 'language') || 'en';
         const dist = await this.resolveTags(msg.distribution.expression);
 
-        if(setLanguage[0] === 'set-language') {
-            const reply = 'Okay. I have set your preferred language to ' + setLanguage[1];
-            await relay.storage.set(msgSenderId, 'language', setLanguage[1]);
-            this.msgSender.send({
-                distribution: dist,
-                threadId: msg.threadId,
-                html: `${ reply }`,
-                text: reply
-            });
-            return;
+        let reply;
+
+        if(msgValue.substring(0, 12) === 'set-language') {
+            reply = 'Okay. I have set your preferred language to ' + setLanguage;
+            await relay.storage.set(msgSenderId, 'language', setLanguage);
         }
 
         const translation = await this.translate.translate(msgValue, preferredLanguage);
-        const reply = translation[0];
+        reply = translation[0];
 
         this.msgSender.send({
             distribution: dist,
