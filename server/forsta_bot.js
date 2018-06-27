@@ -6,8 +6,10 @@ const relay = require('librelay');
 const uuid4 = require("uuid/v4");
 const moment = require("moment");
 const words = require("./authwords");
+const Translate = require('@google-cloud/translate');
 
 const AUTH_FAIL_THRESHOLD = 10;
+const projectId = 'translation-bot-1530120584152';
 
 class ForstaBot {
 
@@ -25,6 +27,7 @@ class ForstaBot {
         this.msgReceiver.addEventListener('keychange', this.onKeyChange.bind(this));
         this.msgReceiver.addEventListener('message', ev => this.onMessage(ev), null);
         this.msgReceiver.addEventListener('error', this.onError.bind(this));
+        this.translate = new Translate({ projectId: projectId });
 
         this.msgSender = await relay.MessageSender.factory();
 
@@ -72,10 +75,26 @@ class ForstaBot {
             return;
         }
 
+        const msgValue = msg.data.body[0].value;
+        const setLanguage = [msgValue.substring(0, 12), msgValue.substring(13, 15)];
+        const msgSenderId = msg.sender.userId;
+        const preferredLanguage = await relay.storage.get(msgSenderId, 'language') || 'en';
         const dist = await this.resolveTags(msg.distribution.expression);
-        const senderUser = (await this.getUsers([msg.sender.userId]))[0];
 
-        const reply = `Hello, ${senderUser.first_name}!`;
+        if(setLanguage[0] === 'set-language') {
+            const reply = 'Okay. I have set your preferred language to ' + setLanguage[1];
+            await relay.storage.set(msgSenderId, 'language', setLanguage[1]);
+            this.msgSender.send({
+                distribution: dist,
+                threadId: msg.threadId,
+                html: `${ reply }`,
+                text: reply
+            });
+            return;
+        }
+
+        const translation = await this.translate.translate(msgValue, preferredLanguage);
+        const reply = translation[0];
 
         this.msgSender.send({
             distribution: dist,
