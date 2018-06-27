@@ -24,6 +24,7 @@
     "messaging-bot": "./server/index.js"
   },
   "dependencies": {
+    "@google-cloud/translate": "^1.1.0",
     "adm-zip": "^0.4.7",
     "browserify": "^14.5.0",
     "csv-stringify": "2.0.0",
