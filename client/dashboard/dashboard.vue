@@ -7,7 +7,7 @@
         <div class="ui basic segment huge">
             <h1 class="ui header">
                 <i class="large circular asterisk loading icon"></i>
-                Hello World Bot Running
+                Messaging Bot Running
             </h1>
         </div>
     </div>
@@ -22,6 +22,8 @@ module.exports = {
     methods: {
     },
     mounted: function() {
+        console.log(this.global.onboardStatus, this.$router.path);
+
         if (this.global.onboardStatus !== 'complete') {
             this.$router.push({ name: 'welcome' });
             return;
@@ -33,9 +35,8 @@ module.exports = {
                 this.$router.push({ name: 'welcome' });
             }
         });
-
         if (!this.global.apiToken) {
-            this.$router.push({ name: 'authenticate', query: { forwardTo: this.$router.path }});
+            this.$router.push({ name: 'loginTag', query: { forwardTo: this.$router.path }});
             return;
         }
     }

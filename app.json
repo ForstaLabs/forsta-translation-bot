@@ -1,16 +1,21 @@
 {
-    "name": "Forsta Messaging Bot",
-    "description": "Secure autonomous message receipt, processing, storage, and/or transmission on the Forsta messaging platform.",
-    "repository": "https://github.com/ForstaLabs/messaging-bot.git",
-    "logo": "https://raw.githubusercontent.com/ForstaLabs/messaging-bot/master/images/forsta-logo.svg?sanitize=true",
-    "keywords": ["forsta", "messaging", "bot", "e-discovery", "security"],
+    "name": "Forsta Compliance Monitor",
+    "description": "A Forsta 'monitor' bot that monitors all message traffic in an organization to flag messages with noteworthy content.",
+    "repository": "https://github.com/ForstaLabs/compliance-monitor.git",
+    "logo": "https://raw.githubusercontent.com/ForstaLabs/compliance-monitor/master/images/forsta-logo.svg?sanitize=true",
+    "keywords": ["forsta", "messaging", "bot", "compliance", "monitor"],
     "website": "https://forsta.io",
-    "addons": ["heroku-redis"],
+    "addons": ["heroku-postgresql"],
     "env": {
       "RELAY_STORAGE_BACKING": {
-        "description": "Control where bot settings and data will be stored.  For heroku 'redis' is recommended.",
+        "description": "Control where bot settings and data will be stored.  For heroku 'postgresql' is recommended.",
         "required": false,
-        "value": "redis"
+        "value": "postgres"
+      },
+      "HEROKU_FORCE_SSL": {
+        "description": "Require that all communications with the compliance monitor be via SSL.",
+        "required": true,
+        "value": "yes"
       }
     },
     "buildpacks": [{

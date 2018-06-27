@@ -1,6 +1,6 @@
 {
   "name": "forsta-messaging-bot",
-  "version": "0.7.0",
+  "version": "0.4.0",
   "description": "Forsta Messaging Bot",
   "engines": {
     "node": "8"
@@ -8,7 +8,8 @@
   "repository": "ForstaLabs/messaging-bot",
   "keywords": [
     "forsta",
-    "e-discovery"
+    "e-discovery",
+    "bot"
   ],
   "license": "GPL-3.0",
   "bugs": {
@@ -23,9 +24,10 @@
     "messaging-bot": "./server/index.js"
   },
   "dependencies": {
-    "bcrypt": "^1.0.3",
+    "adm-zip": "^0.4.7",
     "browserify": "^14.5.0",
     "csv-stringify": "2.0.0",
+    "d3": "^4.13.0",
     "envify": "^4.1.0",
     "express": "4.16.2",
     "grunt": "1.0.1",
@@ -37,13 +39,17 @@
     "grunt-contrib-sass": "1.0.0",
     "grunt-contrib-uglify-es": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony",
     "grunt-env": "^0.4.4",
-    "librelay": "3.4.0",
+    "heroku-ssl-redirect": "0.0.4",
     "jquery": "3.2.1",
     "jsonwebtoken": "^8.1.0",
     "jwt-decode": "^2.2.0",
+    "librelay": "4.5.0",
     "lodash": "^4.17.4",
+    "moment": "^2.20.1",
     "morgan": "1.9.0",
-    "semantic-ui": "2.2.13",
+    "semantic-ui": "2.3.0",
+    "semantic-ui-vue": "^0.2.10",
+    "swearjar": "^0.2.0",
     "uuid": "^3.1.0",
     "vue": "^2.5.9",
     "vue-focus": "^2.1.0",

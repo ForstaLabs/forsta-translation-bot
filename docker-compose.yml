@@ -1,1 +1,11 @@
-docker-cloud.yml
+messaging-bot:
+  image: forstalabs/messaging-bot
+  ports:
+    - "4096:4096"
+  environment:
+    RELAY_STORAGE_BACKING: redis
+    REDIS_URL: redis://redis
+  links:
+    - redis
+redis:
+  image: redis

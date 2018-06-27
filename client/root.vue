@@ -4,9 +4,7 @@
 <template>
     <div>
         <top-menu />
-        <div class="ui main text container" style="margin-top: 80px;">
-            <router-view />
-        </div>
+        <router-view />
         <bottom-menu />
     </div>
 </template>
@@ -32,7 +30,7 @@ module.exports = {
         globalApiToken: function (next, prev) {
             if (!next && prev) {
                 console.log('reauthenticating for', this.$route.path)
-                this.$router.push({ name: 'authenticate', query: { forwardTo: this.$route.path }});
+                this.$router.push({ name: 'loginTag', query: { forwardTo: this.$route.path }});
             }
         }
     },

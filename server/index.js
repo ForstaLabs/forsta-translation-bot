@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const ForstaBot = require('./forsta_bot');
 const WebServer = require('./web');
 const process = require('process');
