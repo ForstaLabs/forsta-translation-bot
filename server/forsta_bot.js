@@ -61,6 +61,25 @@ class ForstaBot {
     fqLabel(user) { return `${this.fqTag(user)} (${this.fqName(user)})`; }
 
     async onMessage(ev) {
+        const msg = this.getMsg(ev);
+        if (!msg) {
+            console.error("Received unsupported message:", msg);
+            return;
+        }
+
+        const msgText = msg.data.body[0].value;
+        const senderId = msg.sender.userId;
+        const threadId = msg.threadId;
+        const dist = await this.resolveTags(msg.distribution.expression);
+        if(msgText.substring(0, 12) === 'set-language') {
+            const language = msgText.substring(13, msgText.length);
+            await this.setPreferredLanguage(dist, language, threadId, senderId);
+        } else {
+            await this.translateByUser(dist, threadId, msgText, senderId);
+        }
+    }
+
+    getMsg(ev) {
         const message = ev.data.message;
         const msgEnvelope = JSON.parse(message.body);
         let msg;
@@ -70,34 +89,28 @@ class ForstaBot {
                 break;
             }
         }
-        if (!msg) {
-            console.error("Received unsupported message:", msgEnvelope);
-            return;
-        }
+        return msg;        
+    }
 
-        const msgValue = msg.data.body[0].value;
-        const setLanguage = msgValue.substring(13, msgValue.length);
-        const msgSenderId = msg.sender.userId;
-        const preferredLanguage = await relay.storage.get(msgSenderId, 'language') || 'en';
-        const dist = await this.resolveTags(msg.distribution.expression);
-
-        let reply, translation;
-
-        if(msgValue.substring(0, 12) === 'set-language') {
-            await relay.storage.set(msgSenderId, 'language', setLanguage);
-            reply = 'Okay. I have set your preferred language to ' + setLanguage;
-            translation = await this.translate.translate(reply, preferredLanguage);
-        } else {
-            translation = await this.translate.translate(msgValue, preferredLanguage);
-        }        
-        
-        reply = translation[0];        
-
+    async setPreferredLanguage(dist, language, threadId, user) {        
+        await relay.storage.set(user, 'language', language);
+        let reply = await this.translate.translate('Okay. I have set your preferred language to ' + language, language);
         this.msgSender.send({
             distribution: dist,
-            threadId: msg.threadId,
-            html: `${ reply }`,
-            text: reply
+            threadId: threadId,
+            html: `${ reply[0] }`,
+            text: reply[0]
+        });
+    }
+
+    async translateByUser(dist, threadId, message, user) {
+        const language = await relay.storage.get(user, 'language') || 'en';        
+        let reply = await this.translate.translate(message, language);
+        this.msgSender.send({
+            distribution: dist,
+            threadId: threadId,
+            html: `${ reply[0] }`,
+            text: reply[0]
         });
     }
 
