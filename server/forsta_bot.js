@@ -32,6 +32,9 @@ class ForstaBot {
         this.msgSender = await relay.MessageSender.factory();
 
         await this.msgReceiver.connect();
+
+        this.newLanguageDetectionCount = 0;
+        this.DETECTION_THRESHOLD = 10;
     }
 
     stop() {
@@ -86,10 +89,10 @@ class ForstaBot {
         if(msgValue.substring(0, 12) === 'set-language') {
             reply = 'Okay. I have set your preferred language to ' + setLanguage;
             await relay.storage.set(msgSenderId, 'language', setLanguage);
-        }
-
-        const translation = await this.translate.translate(msgValue, preferredLanguage);
-        reply = translation[0];
+        }else{
+            const translation = await this.translate.translate(msgValue, preferredLanguage);
+            reply = translation[0];
+        }        
 
         this.msgSender.send({
             distribution: dist,
@@ -97,6 +100,63 @@ class ForstaBot {
             html: `${ reply }`,
             text: reply
         });
+
+        this.translate.detect(msgValue)
+            .then(results => {
+                let detections = results[0];
+                detections = Array.isArray(detections) 
+                    ? detections
+                    : [detections];
+                
+                detections.forEach(detection => {
+                    if(detection.language != preferredLanguage){
+                        this.newLanguageDetectionCount += 1;
+                        if(this.newLanguageDetectionCount >= this.DETECTION_THRESHOLD){
+                            let infoMsg = 'Your messages are in a language other than your default. Run the command: set-language {language} for automatic translation with Google Translate.\nIf you would like to disable the translation bot and these messages, run the command: disable-translation-bot';
+                            if(preferredLanguage != 'en'){                                
+                                this.sendTranslatedMessage(preferredLanguage, dist, msg.threadId, infoMsg);
+                            }else{
+                                this.msgSender.send({
+                                    distribution: dist,
+                                    threadId: msg.threadId,
+                                    html: `${ infoMsg }`,
+                                    text: infoMsg
+                                });
+                            }
+                            this.newLanguageDetectionCount = 0;
+                        }
+                    }
+                });
+            });
+    }
+
+    printInfoMessage(preferredLanguage, dist, threadId){
+        let infoMsg = 'Hello I am the translation bot, use the command set-language {language} to tell me to translate for you';
+        if(preferredLanguage != 'en'){
+            sendTranslatedMessage(preferredLanguage, dist, threadId, infoMsg);
+        }else{
+            this.msgSender.send({
+                distribution: dist,
+                threadId: threadId,
+                html: infoMsg,
+                text: ""
+            });
+        }
+    }
+
+    sendTranslatedMessage(preferredLanguage, dist, threadId, msg){
+        this.translate
+        .translate(msg, preferredLanguage)
+        .then(results => {
+            infoMsg = results[0];
+            this.msgSender.send({
+                distribution: dist, 
+                threadId: threadId,
+                html: infoMsg, 
+                text: infoMsg
+            });
+        })
+        .catch(error => console.log(error));
     }
 
     forgetStaleNotificationThreads() {
