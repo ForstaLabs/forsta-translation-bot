@@ -88,10 +88,11 @@ class ForstaBot {
         const preferredLanguage = await relay.storage.get(msg.sender.userId, 'language') || 'none';    
 
         if(preferredLanguage == 'none'){
-            //need to add a disable translate option so this command won't be shown over and over
-            let detectedLangIsoCode = "";
+            //need to add a disable translate option or something similar
+            //so this command won't be shown over and over
             this.translate.detect(msgValue)
             .then( results => {
+                let detectedLangIsoCode = "";
                 let detections = results[0];
                 detections = Array.isArray(detections) ? detections : [detections];
                 detections.forEach(detection => {
