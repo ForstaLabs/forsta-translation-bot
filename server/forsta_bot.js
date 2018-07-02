@@ -7,6 +7,7 @@ const uuid4 = require("uuid/v4");
 const moment = require("moment");
 const words = require("./authwords");
 const Translate = require('@google-cloud/translate');
+const isoConv = require('iso-language-converter');
 
 const AUTH_FAIL_THRESHOLD = 10;
 const projectId = 'translation-bot-1530120584152';
@@ -26,15 +27,11 @@ class ForstaBot {
         this.msgReceiver = await relay.MessageReceiver.factory();
         this.msgReceiver.addEventListener('keychange', this.onKeyChange.bind(this));
         this.msgReceiver.addEventListener('message', ev => this.onMessage(ev), null);
-        this.msgReceiver.addEventListener('error', this.onError.bind(this));
-        this.translate = new Translate({ projectId: projectId });
-
+        this.msgReceiver.addEventListener('error', this.onError.bind(this));        
         this.msgSender = await relay.MessageSender.factory();
-
         await this.msgReceiver.connect();
 
-        this.newLanguageDetectionCount = 0;
-        this.DETECTION_THRESHOLD = 10;
+        this.translate = new Translate({ projectId: projectId });
     }
 
     stop() {
@@ -59,11 +56,19 @@ class ForstaBot {
         console.error('Message Error', e, e.stack);
     }
 
-    fqTag(user) { return `@${user.tag.slug}:${user.org.slug}`; }
-    fqName(user) { return [user.first_name, user.middle_name, user.last_name].map(s => (s || '').trim()).filter(s => !!s).join(' '); }
-    fqLabel(user) { return `${this.fqTag(user)} (${this.fqName(user)})`; }
+    fqTag(user) { 
+        return `@${user.tag.slug}:${user.org.slug}`; 
+    }
 
-    async onMessage(ev) {
+    fqName(user) { 
+        return [user.first_name, user.middle_name, user.last_name].map(s => (s || '').trim()).filter(s => !!s).join(' '); 
+    }
+
+    fqLabel(user) { 
+        return `${this.fqTag(user)} (${this.fqName(user)})`; 
+    }
+
+    async onMessage(ev) {        
         const message = ev.data.message;
         const msgEnvelope = JSON.parse(message.body);
         let msg;
@@ -78,82 +83,49 @@ class ForstaBot {
             return;
         }
 
-        const msgValue = msg.data.body[0].value;
-        const setLanguage = msgValue.substring(13, 15);
-        const msgSenderId = msg.sender.userId;
-        const preferredLanguage = await relay.storage.get(msgSenderId, 'language') || 'en';
+        const msgValue = msg.data.body[0].value;        
         const dist = await this.resolveTags(msg.distribution.expression);
+        const preferredLanguage = await relay.storage.get(msg.sender.userId, 'language') || 'none';    
 
-        let reply;
+        if(preferredLanguage == 'none'){
+            //need to add a disable translate option so this command won't be shown over and over
+            let detectedLangIsoCode = "";
+            this.translate.detect(msgValue)
+            .then( results => {
+                let detections = results[0];
+                detections = Array.isArray(detections) ? detections : [detections];
+                detections.forEach(detection => {
+                    detectedLangIsoCode = detection.language;
+                });
+                if(!detectedLangIsoCode) detectedLangIsoCode = 'en';
+                let detectedLang = isoConv(detectedLangIsoCode);
+                this.sendTranslatedMessage(detectedLang, dist, msg.threadId, 
+                `Hello I am the translate bot! I have detected you are speaking in ${detectedLang}.
+                Use the command set-language ${detectedLang} and I will translate each message for you!`);
+            });
+        }    
 
         if(msgValue.substring(0, 12) === 'set-language') {
-            reply = 'Okay. I have set your preferred language to ' + setLanguage;
-            await relay.storage.set(msgSenderId, 'language', setLanguage);
-        }else{
-            const translation = await this.translate.translate(msgValue, preferredLanguage);
-            reply = translation[0];
-        }        
-
-        this.msgSender.send({
-            distribution: dist,
-            threadId: msg.threadId,
-            html: `${ reply }`,
-            text: reply
-        });
-
-        this.translate.detect(msgValue)
-            .then(results => {
-                let detections = results[0];
-                detections = Array.isArray(detections) 
-                    ? detections
-                    : [detections];
-                
-                detections.forEach(detection => {
-                    if(detection.language != preferredLanguage){
-                        this.newLanguageDetectionCount += 1;
-                        if(this.newLanguageDetectionCount >= this.DETECTION_THRESHOLD){
-                            let infoMsg = 'Your messages are in a language other than your default. Run the command: set-language {language} for automatic translation with Google Translate.\nIf you would like to disable the translation bot and these messages, run the command: disable-translation-bot';
-                            if(preferredLanguage != 'en'){                                
-                                this.sendTranslatedMessage(preferredLanguage, dist, msg.threadId, infoMsg);
-                            }else{
-                                this.msgSender.send({
-                                    distribution: dist,
-                                    threadId: msg.threadId,
-                                    html: `${ infoMsg }`,
-                                    text: infoMsg
-                                });
-                            }
-                            this.newLanguageDetectionCount = 0;
-                        }
-                    }
-                });
-            });
-    }
-
-    printInfoMessage(preferredLanguage, dist, threadId){
-        let infoMsg = 'Hello I am the translation bot, use the command set-language {language} to tell me to translate for you';
-        if(preferredLanguage != 'en'){
-            sendTranslatedMessage(preferredLanguage, dist, threadId, infoMsg);
-        }else{
-            this.msgSender.send({
-                distribution: dist,
-                threadId: threadId,
-                html: infoMsg,
-                text: ""
-            });
-        }
+            let setLanguage = msgValue.trim().split(' ')[1];
+            setLanguage = setLanguage.charAt(0).toUpperCase() + setLanguage.slice(1);
+            let setLanguageIsoCode = isoConv(setLanguage);
+            
+            let reply = 'Okay. I have set your preferred language to ' + setLanguage;    
+            await relay.storage.set(msg.sender.userId, 'language', setLanguageIsoCode)
+            .then(this.sendTranslatedMessage(setLanguageIsoCode, dist, msg.threadId, reply));
+        }             
     }
 
     sendTranslatedMessage(preferredLanguage, dist, threadId, msg){
         this.translate
         .translate(msg, preferredLanguage)
         .then(results => {
-            infoMsg = results[0];
+            msg = results[0];
             this.msgSender.send({
                 distribution: dist, 
                 threadId: threadId,
-                html: infoMsg, 
-                text: infoMsg
+                html: `${msg}`, 
+                text: msg
             });
         })
         .catch(error => console.log(error));
