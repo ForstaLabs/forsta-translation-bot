@@ -89,7 +89,7 @@ class ForstaBot {
         if (mentions.filter(m => { return m === this.ourId; }).length > 0) {
             await this.respondToCommand(dist, threadId, msgId, msgText, senderId);
         } else if (!language) {
-            await this.respondToDetection(dist, threadId, msgId, msgText);
+            await this.respondToDetection(dist, threadId, msgId, msgText, senderId);
         } else {
             await this.translateByUser(dist, threadId, msgId, msgText, senderId);
         }
@@ -144,6 +144,7 @@ class ForstaBot {
         const command = messageText.split(' ')[1];  
         const language = await this.getSenderLanguage(command, sender, messageText); 
         const reply = await this.getCommandReply(command, dist, language, threadId, sender);
+        dist.userids = [sender];
         await this.msgSender.send({
             distribution: dist,
             threadId: threadId,
@@ -153,10 +154,11 @@ class ForstaBot {
         });
     }
 
-    async respondToDetection(dist, threadId, messageId, message) {
+    async respondToDetection(dist, threadId, messageId, message, sender) {
         const response = await this.getDetectionReply(dist, threadId, message);
         const translation = await this.translate.translate(response.reply, response.language);
         const reply = translation[0];
+        dist.userids = [sender];
         await this.msgSender.send({
             distribution: dist, 
             threadId: threadId,
@@ -168,10 +170,14 @@ class ForstaBot {
 
     async translateByUser(dist, threadId, messageId, messageText, sender) {
         const users = await this.getUsers(dist.userids);
-        for(const user of users) {                        
+        for(const user of users) {  
+            if(user.id === sender) {
+                continue;
+            }                      
             const language = await relay.storage.get(user.id, 'language') || 'en';        
             const translation = await this.translate.translate(messageText, language);
-            const reply = translation[0];               
+            const reply = translation[0];  
+            dist.userids = [user.id];             
             await this.msgSender.send({
                 distribution: dist,
                 threadId: threadId,
