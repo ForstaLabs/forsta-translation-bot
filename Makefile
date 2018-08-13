@@ -7,7 +7,6 @@ LINT := .lint.pass
 BUILD := dist/build.json
 
 export NO_MINIFY ?= 1
-export GOOGLE_APPLICATION_CREDENTIALS = $(shell pwd)/TranslationBot.json
 
 packages: $(PACKAGES)
 semantic: $(SEMANTIC)
