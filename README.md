@@ -4,7 +4,7 @@ Secure autonomous message receipt, processing, storage, and/or transmission on t
 
 [![NPM](https://img.shields.io/npm/v/forsta-messaging-bot.svg)](https://www.npmjs.com/package/forsta-messaging-bot)
 [![Change Log](https://img.shields.io/badge/change-log-blue.svg)](https://github.com/ForstaLabs/vault/blob/master/CHANGELOG.md)
-[![License](https://img.shields.io/npm/l/forsta-messaging-bot.svg)](https://github.com/ForstaLabs/messaging-bot)
+[![License](https://img.shields.io/npm/l/forsta-messaging-bot.svg)](https://github.com/ForstaLabs/translation-bot)
 
 
 About
@@ -91,8 +91,8 @@ Developer Install
 If you want to build upon the Forsta Messaging Bot or just get closer to the code, 
 you can install and run directly from the source code.
 
-    git clone https://github.com/ForstaLabs/messaging-bot.git
-    cd messaging-bot
+    git clone https://github.com/ForstaLabs/translation-bot.git
+    cd translation-bot
     npm install
     npm start
 

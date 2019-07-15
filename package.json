@@ -1,11 +1,11 @@
 {
-  "name": "forsta-messaging-bot",
+  "name": "forsta-translation-bot",
   "version": "0.4.0",
-  "description": "Forsta Messaging Bot",
+  "description": "Forsta Translation Bot",
   "engines": {
     "node": "8"
   },
-  "repository": "ForstaLabs/messaging-bot",
+  "repository": "ForstaLabs/translation-bot",
   "keywords": [
     "forsta",
     "e-discovery",
@@ -13,15 +13,15 @@
   ],
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/ForstaLabs/messaging-bot/issues"
+    "url": "https://github.com/ForstaLabs/translation-bot/issues"
   },
-  "homepage": "https://github.com/ForstaLabs/messaging-bot#readme",
+  "homepage": "https://github.com/ForstaLabs/translation-bot#readme",
   "scripts": {
     "postinstall": "SKIP_PACKAGES=1 make",
     "start": "node server"
   },
   "bin": {
-    "messaging-bot": "./server/index.js"
+    "translation-bot": "./server/index.js"
   },
   "dependencies": {
     "@google-cloud/translate": "^1.1.0",
