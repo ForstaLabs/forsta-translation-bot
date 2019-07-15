@@ -1,9 +1,9 @@
 {
-    "name": "Forsta Compliance Monitor",
-    "description": "A Forsta 'monitor' bot that monitors all message traffic in an organization to flag messages with noteworthy content.",
-    "repository": "https://github.com/ForstaLabs/compliance-monitor.git",
-    "logo": "https://raw.githubusercontent.com/ForstaLabs/compliance-monitor/master/images/forsta-logo.svg?sanitize=true",
-    "keywords": ["forsta", "messaging", "bot", "compliance", "monitor"],
+    "name": "Forsta Translation Bot",
+    "description": "A Forsta bot that translates messages into different languages.",
+    "repository": "https://github.com/ForstaLabs/translation-bot.git",
+    "logo": "https://raw.githubusercontent.com/ForstaLabs/translation-bot/master/images/forsta-logo.svg?sanitize=true",
+    "keywords": ["forsta", "messaging", "bot", "translation", "monitor"],
     "website": "https://forsta.io",
     "addons": ["heroku-postgresql"],
     "env": {
