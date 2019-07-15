@@ -7,7 +7,7 @@
         <div class="ui basic segment huge">
             <h1 class="ui header">
                 <i class="large circular asterisk loading icon"></i>
-                Messaging Bot Running
+                Translation Bot Running
             </h1>
         </div>
     </div>
