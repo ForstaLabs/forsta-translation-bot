@@ -1,23 +1,60 @@
-Forsta Messaging Bot
+Forsta Translation Bot
 ========
-Secure autonomous message receipt, processing, storage, and/or transmission on the Forsta messaging platform.
 
-[![NPM](https://img.shields.io/npm/v/forsta-messaging-bot.svg)](https://www.npmjs.com/package/forsta-messaging-bot)
-[![Change Log](https://img.shields.io/badge/change-log-blue.svg)](https://github.com/ForstaLabs/vault/blob/master/CHANGELOG.md)
-[![License](https://img.shields.io/npm/l/forsta-messaging-bot.svg)](https://github.com/ForstaLabs/translation-bot)
-
-
-About
--------
-This repository is a (skeleton) Node.js-based Forsta end-to-end-encrypted messaging client.
+This repository is based on a Node.js-based Forsta end-to-end-encrypted messaging client.
 It allows for autonomous receipt, processing, storage, and/or transmission of messaging 
-data to perform some useful task. Please fork it or one of our several projects based 
-off of it!
+data to perform some useful task.
 
-A Forsta messaging bot can be set up to receive messages sent to a particular user, 
-**or** (if you are an organization administrator) it can be set up as a special 
-organization "monitor" which will receive copies of *all* messaging traffic to, from, 
-or among users in your organization.
+This bot is used as a translator for threads. Upon initial setup you associate the bot with a user by giving their credentials to the bot (e.g. @translation.bot). Subsequently all messages sent to that user will be forwarded to the bot and processed.
+
+Then you can simply /add the bot to your thread
+and configure it by @mentioning it. (e.g. @translation.bot language spanish).
+Once configured the bot will translate each incoming message to the language using Google Translate to the language of your choice.
+
+Here are a list of my commands: 
+``` 
+help - lists my commands 
+info - provides a summary of what I do
+language [language] - sets your preferred language to the specified language`
+```
+
+Install Requirements
+--------
+ * Node.js 8 (or newer)
+ * Ruby
+   * sass (`gem install sass`)
+ * [A Google cloud service token](https://cloud.google.com/translate/docs/quickstart-client-libraries)
+ * [Redis](https://redis.io/topics/quickstart)
+   
+
+Developer Install
+--------
+If you want to build upon the Forsta Messaging Bot or just get closer to the code, 
+you can install and run directly from the source code.
+
+    export RELAY_STORAGE_BACKING=redis
+    git clone https://github.com/ForstaLabs/translation-bot.git
+    cd translation-bot
+    make run
+
+
+Usage
+--------
+Once running, the default port and listening address are `0.0.0.0:4096`.  If
+you are running locally you can access the web interface by opening
+*http://localhost:4096*.
+
+You can change the listening address by setting `LISTEN_ADDR` to a valid host
+address for your server, E.g. something like `localhost` or `127.0.0.1` to only
+accept local connections.
+
+The default listening port can be changed by setting `PORT` to any valid
+numeric port, e.g. `8000`.
+
+Storage is managed through Forsta
+[librelay](https://github.com/ForstaLabs/librelay-node) which currently
+supports local filesystem and Redis.  For more information about setting
+up custom storage see: https://github.com/ForstaLabs/librelay-node#storage.
 
 The Why &mdash; Decentralized Data Security
 --------
@@ -51,70 +88,6 @@ another kind of messaging client, like the messaging clients running in users’
 browsers and on their phones. And just like the other messaging clients, Forsta 
 bots send and receive end-to-end encrypted messages to do their work **while 
 running in a context controlled by the user**.
-
-
-Quick Start
---------
-These deployment buttons can be used to validate that this messaging bot
-will meet your organizations needs with as little setup pain as possible.  
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ForstaLabs/translation-bot)
-[![Deploy to Docker Cloud](https://files.cloud.docker.com/images/deploy-to-dockercloud.svg)](https://cloud.docker.com/stack/deploy/)
-
-
-Install Requirements
---------
- * Node.js 8 (or newer)
- * Ruby
-   * sass (`gem install sass`)
-   
-
-Installation
---------
-You can choose from our official docker image or NPM package depending on your
-preference.
-
-### Docker
-    docker run -p4096:4096 forstalabs/messaging-bot
-
-Or to run a stack using docker-compose that includes redis for storage...
-
-    docker-compose up
-
-### NPM
-    npm install -g forsta-messaging-bot
-    messaging-bot
-
-
-Developer Install
---------
-If you want to build upon the Forsta Messaging Bot or just get closer to the code, 
-you can install and run directly from the source code.
-
-    git clone https://github.com/ForstaLabs/translation-bot.git
-    cd translation-bot
-    npm install
-    npm start
-
-
-Usage
---------
-Once running, the default port and listening address are `0.0.0.0:4096`.  If
-you are running locally you can access the web interface by opening
-*http://localhost:4096*.
-
-You can change the listening address by setting `LISTEN_ADDR` to a valid host
-address for your server, E.g. something like `localhost` or `127.0.0.1` to only
-accept local connections.
-
-The default listening port can be changed by setting `PORT` to any valid
-numeric port, e.g. `8000`.
-
-Storage is managed through Forsta
-[librelay](https://github.com/ForstaLabs/librelay-node) which currently
-supports local filesystem and Redis.  For more information about setting
-up custom storage see: https://github.com/ForstaLabs/librelay-node#storage.
-
 
 License
 --------
