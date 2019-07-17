@@ -8,3 +8,5 @@ dist
 *.scssc
 .vscode
 .DS_Store
+.env
+translation_api_key

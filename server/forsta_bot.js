@@ -8,9 +8,10 @@ const moment = require("moment");
 const words = require("./authwords");
 const Translate = require('@google-cloud/translate');
 const isoConv = require('iso-language-converter');
+require('dotenv').config();
 
 const AUTH_FAIL_THRESHOLD = 10;
-const projectId = 'translation-bot-1530120584152';
+const projectId = process.env.GOOGLE_PROJECT_ID;
 
 class ForstaBot {
 
@@ -68,51 +69,98 @@ class ForstaBot {
         return `${this.fqTag(user)} (${this.fqName(user)})`; 
     }
 
-    /*------------------------------ 
-        START TRANSLATION BOT LOGIC 
-    --------------------------------*/
     async onMessage(ev) {
         const msg = this.getMsg(ev);
         if (!msg) {
             console.error("Received unsupported message:", msg);
             return;
         }
+        if(msg.messageType == 'control'){
+            return;
 
+        }
         const msgText = msg.data.body[0].value;
         const senderId = msg.sender.userId;
+        if(senderId == this.ourId){
+            return;
+        }
         const threadId = msg.threadId;
         const msgId = msg.messageId;
+        const dist = await this.resolveTags(msg.distribution.expression);
         const mentions = msg.data.mentions || [];
-        const dist = await this.resolveTags(msg.distribution.expression); 
-        const language = await relay.storage.get(msg.sender.userId, 'language');  
-        
-        if (mentions.filter(m => { return m === this.ourId; }).length > 0) {
+        const mentioned = mentions.filter(m => { return m === this.ourId; }).length > 0;
+
+        if (mentioned) {
             await this.respondToCommand(dist, threadId, msgId, msgText, senderId);
-        } else if (!language) {
-            await this.respondToDetection(dist, threadId, msgId, msgText, senderId);
         } else {
             await this.translateByUser(dist, threadId, msgId, msgText, senderId);
         }
     }
 
-    async getCommandReply(command, dist, language, threadId, sender) {
-        const replies = {
-            help: `Here are a list of my commands: \nhelp - lists my commands \ninfo - provides a summary of what I do \nlanguage [language] - sets your preferred language to the specified language`,
-            info: `Hello! I'm a translation bot. When you add me to a conversation, I will translate other people's messages into your preferred language. To set your preferred language, simply mention me in a message, followed by language [language], where [language] is the language code of your preferred language (e.g. 'en').`,
-            language: `Okay. I have set your preferred language to ${language}`
-        };
-        const translation = await this.translate.translate(replies[command], language);
-        return translation[0];
+    async respondToCommand(dist, threadId, messageId, messageText, senderId) {
+        //we need to use this regex because @mentioning adds 
+        //a whitespace char which is different than ' '
+        const msgArray = messageText.split(/(\s+)/).filter(c => !c.match(/(\s+)/));
+        const command = msgArray[1];
+        // dist.userids = [senderId];
+        if (command == 'language') {
+            let languageRaw = msgArray[2];
+            let language = await this.setSenderLanguage(senderId, languageRaw);
+            const languageSetReply = `Okay. I have set your preferred language to ${language}`;
+            const languageSetReplyTranslated = (await this.translate.translate(languageSetReply, language))[0];
+            await this.msgSender.send({
+                distribution: dist,
+                threadId: threadId,
+                messageRef: messageId,
+                html: `${ languageSetReplyTranslated }`,
+                text: languageSetReplyTranslated
+            });
+        }
+        if (command == 'help') {
+            const helpReply = `
+                Command list:\n
+                help - lists my commands\n
+                language [language] - sets your preferred language to the specified language`;
+            await this.msgSender.send({
+                distribution: dist,
+                threadId: threadId,
+                messageRef: messageId,
+                html: `${ helpReply }`,
+                text: helpReply
+            });
+        }
     }
 
-    async getDetectionReply(dist, threadId, msgText) {
-        let detection = await this.translate.detect(msgText);
-        detection = detection[0];
-        let isoCode = detection.language || 'en';
-        let language = isoConv(isoCode);
-        const reply = `Hello I am the translate bot! I have detected you are speaking in ${language}.
-        Use the command @translate.bot language ${language} and I will translate each message for you!`;
-        return {reply: reply, language: isoCode};
+    async setSenderLanguage(senderId, language) {
+        if(language.length > 3) {
+            language = language.charAt(0).toUpperCase() + language.slice(1);
+            language = isoConv(language);
+        }
+        await relay.storage.set('language', senderId, language);
+        return language;
+    }
+
+    async translateByUser(dist, threadId, messageId, messageText, senderId) {
+        const recipients = (await this.getUsers(dist.userids)).filter(u => u.id != senderId && u.id != this.ourId);
+        console.log(recipients);
+        for(const user of recipients) {
+            const language = await relay.storage.get('language', user.id);
+            if(!language){
+                return;
+            }  
+            const translation = await this.translate.translate(messageText, language);
+            const reply = translation[0];  
+            // const distribution = await this.resolveTags(`@${user.tag.slug}`);
+            // console.log(distribution);
+            // dist.userids = [user.id];
+            await this.msgSender.send({
+                distribution: dist,
+                threadId: threadId,
+                messageRef: messageId,
+                html: `${ reply }`,
+                text: reply
+            });
+        }
     }
 
     getMsg(ev) {
@@ -127,69 +175,6 @@ class ForstaBot {
         }  
         return msg;                
     }
-
-    async getSenderLanguage(command, sender, msgText) {
-        if(command === 'language') {
-            let language = msgText.split(' ')[2];
-            if(language.length > 3) {
-                language = language.charAt(0).toUpperCase() + language.slice(1);
-                language = isoConv(language);
-            }
-            await relay.storage.set(sender, 'language', language);
-        }
-        return await relay.storage.get(sender, 'language') || 'en';  
-    }
-
-    async respondToCommand(dist, threadId, messageId, messageText, sender) {     
-        const command = messageText.split(' ')[1];  
-        const language = await this.getSenderLanguage(command, sender, messageText); 
-        const reply = await this.getCommandReply(command, dist, language, threadId, sender);
-        dist.userids = [sender];
-        await this.msgSender.send({
-            distribution: dist,
-            threadId: threadId,
-            messageRef: messageId,
-            html: `${ reply }`,
-            text: reply
-        });
-    }
-
-    async respondToDetection(dist, threadId, messageId, message, sender) {
-        const response = await this.getDetectionReply(dist, threadId, message);
-        const translation = await this.translate.translate(response.reply, response.language);
-        const reply = translation[0];
-        dist.userids = [sender];
-        await this.msgSender.send({
-            distribution: dist, 
-            threadId: threadId,
-            messageRef: messageId,
-            html: `${reply}`, 
-            text: reply
-        });   
-    }
-
-    async translateByUser(dist, threadId, messageId, messageText, sender) {
-        const users = await this.getUsers(dist.userids);
-        for(const user of users) {  
-            if(user.id === sender) {
-                continue;
-            }                      
-            const language = await relay.storage.get(user.id, 'language') || 'en';        
-            const translation = await this.translate.translate(messageText, language);
-            const reply = translation[0];  
-            dist.userids = [user.id];             
-            await this.msgSender.send({
-                distribution: dist,
-                threadId: threadId,
-                messageRef: messageId,
-                html: `${ reply }`,
-                text: reply
-            });
-        }
-    }
-    /*------------------------------ 
-        END TRANSLATION BOT LOGIC 
-    --------------------------------*/
 
     forgetStaleNotificationThreads() {
         let tooOld = new Date();
