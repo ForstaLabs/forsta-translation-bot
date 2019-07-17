@@ -141,7 +141,7 @@ class ForstaBot {
     }
 
     async translateByUser(dist, threadId, messageId, messageText, senderId) {
-        const recipients = (await this.getUsers(dist.userids)).filter(u => u.id != senderId && u.id != this.ourId);
+        const recipients = (await this.getUsers(dist.userids));
         console.log(recipients);
         for(const user of recipients) {
             const language = await relay.storage.get('language', user.id);
