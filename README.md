@@ -5,38 +5,57 @@ This repository is based on a Node.js-based Forsta end-to-end-encrypted messagin
 It allows for autonomous receipt, processing, storage, and/or transmission of messaging 
 data to perform some useful task.
 
-This bot is used as a translator for threads. Upon initial setup you associate the bot with a user by giving their credentials to the bot (e.g. @translation.bot). Subsequently all messages sent to that user will be forwarded to the bot and processed.
+This bot is used as a translator for threads. Upon initial setup you associate the bot with a user by 
+giving their credentials to the bot. For example, as org administrator you might create a new
+user called '@translation.bot' and use them as the bot.
+Once the user is associated with the bot, all messages sent to that user will be forwarded
+to the bot and subsequently processed.
 
-Then you can simply /add the bot to your thread
+Once you have assigned a user to the bot you can simply /add that user to your thread
 and configure it by @mentioning it. (e.g. @translation.bot language spanish).
 Once configured the bot will translate each incoming message to the language using Google Translate to the language of your choice.
 
-Here are a list of my commands: 
+Here are a list of commands for the translation bot: 
 ``` 
 help - lists my commands 
-info - provides a summary of what I do
 language [language] - sets your preferred language to the specified language`
 ```
 
+Once you have a language configured the translation bot with reply to all messages in the thread
+with a translation.
+
 Install Requirements
 --------
- * Node.js 8 (or newer)
+ * Node.js 8
  * Ruby
    * sass (`gem install sass`)
- * [A Google cloud service token](https://cloud.google.com/translate/docs/quickstart-client-libraries)
+ * [A Google cloud service account](https://cloud.google.com/translate/docs/quickstart-client-libraries)
  * [Redis](https://redis.io/topics/quickstart)
    
 
 Developer Install
 --------
-If you want to build upon the Forsta Messaging Bot or just get closer to the code, 
-you can install and run directly from the source code.
+Create a file named .env with the following values:
+```
+RELAY_STORAGE_BACKING=redis
+GOOGLE_PROJECT_ID=[google cloud project id with the translation API enabled]
+GOOGLE_APPLICATION_CREDENTIALS=[path to application credentials JSON file]
+```
 
-    export RELAY_STORAGE_BACKING=redis
-    git clone https://github.com/ForstaLabs/translation-bot.git
-    cd translation-bot
-    make run
+Clone this repository and build:
+```
+git clone https://github.com/ForstaLabs/translation-bot.git
+cd translation-bot
+make run
+```
 
+Note on Heroku
+--------
+Deploying to heroku requires that you have valid a application credentials json file for 
+the Google Cloud Translation API. However you may not want to check in your credential
+file to github. Therefore when deploying to heroku use this buildpack: 
+
+https://elements.heroku.com/buildpacks/elishaterada/heroku-google-application-credentials-buildpack
 
 Usage
 --------
