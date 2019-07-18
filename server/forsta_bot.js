@@ -141,18 +141,22 @@ class ForstaBot {
     }
 
     async translateByUser(dist, threadId, messageId, messageText, senderId) {
+        console.log('translating. ...');
         const recipients = (await this.getUsers(dist.userids));
-        console.log(recipients);
+        let languages = new Set();
         for(const user of recipients) {
             const language = await relay.storage.get('language', user.id);
-            if(!language){
-                return;
-            }  
+            if(language) {
+                languages.add(language);
+            }
+            console.log(language);
+        }
+        console.log(languages);
+        console.log(languages.values());
+        languages.forEach(async language => {
+            console.log(language);
             const translation = await this.translate.translate(messageText, language);
             const reply = translation[0];  
-            // const distribution = await this.resolveTags(`@${user.tag.slug}`);
-            // console.log(distribution);
-            // dist.userids = [user.id];
             await this.msgSender.send({
                 distribution: dist,
                 threadId: threadId,
@@ -160,7 +164,7 @@ class ForstaBot {
                 html: `${ reply }`,
                 text: reply
             });
-        }
+        });
     }
 
     getMsg(ev) {
