@@ -141,7 +141,6 @@ class ForstaBot {
     }
 
     async translateByUser(dist, threadId, messageId, messageText, senderId) {
-        console.log('translating. ...');
         const recipients = (await this.getUsers(dist.userids));
         let languages = new Set();
         for(const user of recipients) {
@@ -149,10 +148,7 @@ class ForstaBot {
             if(language) {
                 languages.add(language);
             }
-            console.log(language);
         }
-        console.log(languages);
-        console.log(languages.values());
         languages.forEach(async language => {
             console.log(language);
             const translation = await this.translate.translate(messageText, language);
