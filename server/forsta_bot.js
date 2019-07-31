@@ -153,8 +153,11 @@ class ForstaBot {
             }
         }
         languages.forEach(async language => {
-            console.log(language);
             const translation = await this.translate.translate(messageText, language);
+            if (translation[0].trim() === messageText.trim()) {
+                //don't send meaningless translations
+                return;
+            }
             const reply = translation[0];  
             await this.msgSender.send({
                 distribution: dist,
