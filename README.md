@@ -15,7 +15,7 @@ Once you have assigned a user to the bot you can simply /add that user to your t
 and configure it by @mentioning it. (e.g. @translation.bot language spanish).
 Once configured the bot will translate each incoming message to the language using Google Translate to the language of your choice.
 
-Here are a list of commands for the translation bot: 
+Bot commands:
 ``` 
 help - lists my commands 
 language [language] - sets your preferred language to the specified language`

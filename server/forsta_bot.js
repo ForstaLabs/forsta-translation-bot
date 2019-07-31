@@ -24,6 +24,7 @@ class ForstaBot {
         console.info("Starting message receiver for:", this.ourId);
         this.atlas = await BotAtlasClient.factory();
         this.getUsers = cache.ttl(60, this.atlas.getUsers.bind(this.atlas));
+        this.ourUserData = (await this.getUsers([this.ourId]))[0];
         this.resolveTags = cache.ttl(60, this.atlas.resolveTags.bind(this.atlas));
         this.msgReceiver = await relay.MessageReceiver.factory();
         this.msgReceiver.addEventListener('keychange', this.onKeyChange.bind(this));
@@ -79,7 +80,7 @@ class ForstaBot {
             return;
 
         }
-        const msgText = msg.data.body[0].value;
+        const messageText = msg.data.body[0].value;
         const senderId = msg.sender.userId;
         if(senderId == this.ourId){
             return;
@@ -88,12 +89,14 @@ class ForstaBot {
         const msgId = msg.messageId;
         const dist = await this.resolveTags(msg.distribution.expression);
         const mentions = msg.data.mentions || [];
-        const mentioned = mentions.filter(m => { return m === this.ourId; }).length > 0;
+        const mentioned = 
+            mentions.filter(m => { return m === this.ourId; }).length > 0
+            || messageText.split(/(\s+)/)[0] == "@" + this.ourUserData.tag.slug;
 
         if (mentioned) {
-            await this.respondToCommand(dist, threadId, msgId, msgText, senderId);
+            await this.respondToCommand(dist, threadId, msgId, messageText, senderId);
         } else {
-            await this.translateByUser(dist, threadId, msgId, msgText, senderId);
+            await this.translateByUser(dist, threadId, msgId, messageText, senderId);
         }
     }
 

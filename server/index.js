@@ -15,6 +15,10 @@ process.on('unhandledRejection', ev => {
 
 
 async function run() {
+    if (!process.env.RELAY_STORAGE_BACKING) {
+        console.error("RELAY_STORAGE_BACKING environment variable not set! Aborting.");
+        return;
+    }
     relay.storage.setLabel('bot-1');
     const bot = new ForstaBot();
     await bot.start();
