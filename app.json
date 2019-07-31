@@ -5,12 +5,20 @@
     "logo": "https://raw.githubusercontent.com/ForstaLabs/translation-bot/master/images/forsta-logo.svg?sanitize=true",
     "keywords": ["forsta", "messaging", "bot", "translation", "monitor"],
     "website": "https://forsta.io",
-    "addons": ["heroku-postgresql"],
+    "addons": ["heroku-redis"],
     "env": {
       "RELAY_STORAGE_BACKING": {
         "description": "Control where bot settings and data will be stored.  For heroku 'postgresql' is recommended.",
         "required": false,
-        "value": "postgres"
+        "value": "redis"
+      },
+      "GOOGLE_PROJECT_ID": {
+        "description": "The project ID of the google cloud translation service you are using.",
+        "required": true
+      },
+      "GOOGLE_APPLICATION_CREDENTIALS": {
+        "description": "The content of your application credentials JSON file goes here. At build time it will be imported into your environment.",
+        "required": true
       },
       "HEROKU_FORCE_SSL": {
         "description": "Require that all communications with the compliance monitor be via SSL.",
@@ -19,8 +27,10 @@
       }
     },
     "buildpacks": [{
-        "url": "heroku/ruby"
+      "url": "heroku/ruby"
     }, {
-        "url": "heroku/nodejs"
+      "url": "heroku/nodejs"
+    }, {
+      "url": "https://elements.heroku.com/buildpacks/elishaterada/heroku-google-application-credentials-buildpack"
     }]
 }
