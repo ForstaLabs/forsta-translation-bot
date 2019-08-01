@@ -86,6 +86,7 @@ module.exports = {
                 if (result.ok) {
                     const { token } = result.theJson;
                     this.global.apiToken = token;
+                    this.global.loginTag = 
                     this.global.onboardStatus = 'complete';
                     this.$router.push({ name: 'dashboard' });
                     return false;

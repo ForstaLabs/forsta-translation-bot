@@ -7,13 +7,13 @@
             <div v-if="monitor" class="ui basic segment huge">
                 <h1>
                     <i class="circular icon add user"></i>
-                    Create Catch-All User
+                    Create Translation Bot User
                 </h1>
                 This bot will send and receive messages autonomously <br />
-                as a <b>new</b> Forsta user configured to be a "monitor" <br />
-                so it will receive copies of <b>all</b> organization traffic.<br />
+                as a <b>new</b> Forsta user named 'translation.bot'
                 <br />
-                Please authenticate as an <b>org administrator</b> to create this new user.
+                Please authenticate as an <b>org administrator</b> to automatically
+                create this new user.
             </div>
             <div v-if="!monitor" class="ui basic segment huge">
                 <h1>

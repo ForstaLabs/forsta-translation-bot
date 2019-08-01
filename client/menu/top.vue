@@ -35,7 +35,7 @@ module.exports = {
         settings: function () {
             this.$router.push({ name: 'settings' });
         },
-        triggers: function () {
+        dashboard: function () {
             this.$router.push({ name: 'dashboard' });
         }
     }

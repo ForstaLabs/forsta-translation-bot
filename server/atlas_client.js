@@ -2,12 +2,19 @@ const relay = require("librelay");
 
 class BotAtlasClient extends relay.AtlasClient {
 
+    async fetch(urn, options){
+        return super.fetch(urn, options);
+    }
     static get onboardingCreatedUser() {
-        return null;
+        return {
+            first_name: "Translation",
+            last_name: "Bot",
+            tag_slug: "translation.bot." + Math.floor(Math.random() * 100)
+        };
     }
 
     static get userAuthTokenDescription() {
-        return 'compliance monitor bot';
+        return 'translation bot';
     }
 
     static async onboard(onboardClient) {
@@ -22,11 +29,10 @@ class BotAtlasClient extends relay.AtlasClient {
             try {
                 botUser = await onboardClient.fetch("/v1/user/", {
                     method: "POST",
-                    json: Object.assign({}, this.onboardingCreatedUser, { phone: botUser.phone, email: botUser.email, user_type: "BOT" })                });
+                    json: Object.assign({}, this.onboardingCreatedUser, { phone: botUser.phone, email: botUser.email, user_type: "BOT" })
+                });
                 console.info(
-                    `Created new ${botUser.is_monitor ? "MONITOR" : ""} bot user @${
-                    botUser.tag.slug
-                    }:${botUser.org.slug} <${botUser.id}>`
+                    `Created new bot user @${botUser.tag.slug}:${botUser.org.slug} <${botUser.id}>`
                 );
             } catch (e) {
                 console.error("error during creation of bot user", e);
