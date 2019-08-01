@@ -1,19 +1,19 @@
 Forsta Translation Bot
 ========
 
-This repository is based on a Node.js-based Forsta end-to-end-encrypted messaging client.
-It allows for autonomous receipt, processing, storage, and/or transmission of messaging 
-data to perform some useful task.
+This repository is built from Forsta's [end-to-end-encrypted messaging bot template](https://github.com/ForstaLabs/messaging-bot).
+The Forsta messaging-bot provides for for autonomous receipt, processing, storage, and
+transmission of messaging data in conjunction with the Forsta web messenger and iPhone/Android apps.
+Please fork it or one of our several projects based off of it!
 
-This bot is used as a translator for threads. Upon initial setup you associate the bot with a user by 
-giving their credentials to the bot. For example, as org administrator you might create a new
-user called '@translation.bot' and use them as the bot.
-Once the user is associated with the bot, all messages sent to that user will be forwarded
-to the bot and subsequently processed.
+This particular bot is used as a translator for threads. Upon initial setup you create a new the bot user named
+'translation.bot' and storing their address and authentication token in a database. 
+This will cause all messages sent to that user to be forwarded to the bot and subsequently processed.
 
 Once you have assigned a user to the bot you can simply /add that user to your thread
 and configure it by @mentioning it. (e.g. @translation.bot language spanish).
-Once configured the bot will translate each incoming message to the language using Google Translate to the language of your choice.
+Once configured the bot will translate each message on that thread to the language of your choice and reply
+to the message with a translation.
 
 Bot commands:
 ``` 
