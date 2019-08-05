@@ -7,7 +7,7 @@
             <div class="ui basic segment huge">
                 <h1 class="ui header">
                     <i class="circular icon user"></i>
-                    Translation Bot Login
+                    Live Chat Bot Login
                 </h1>
             </div>
             <div class="ui centered grid">
@@ -16,7 +16,13 @@
                         <div class="field">
                             <label>Authorized User</label>
                             <div class="ui left icon input">
-                                <input v-focus.lazy="true" type="text" v-model='tag' name="tag" placeholder="user:org" autocomplete="off">
+                                <input 
+                                    name="tag" 
+                                    placeholder="user:org" 
+                                    autocomplete="off" 
+                                    type="text" 
+                                    v-focus.lazy="true"  
+                                    v-model='tag' >
                                 <i class="at icon"></i>
                             </div>
                         </div>
@@ -33,10 +39,10 @@
 </template>
 
 <script>
-util = require('../util');
-focus = require('vue-focus');
-shared = require('../globalState');
-jwtDecode = require('jwt-decode');
+const util = require('../util');
+const focus = require('vue-focus');
+const shared = require('../globalState');
+const jwtDecode = require('jwt-decode');
 
 function setup() {
     const apiToken = this.global.apiToken;
@@ -52,7 +58,7 @@ function setup() {
         }
     }
 
-    util.fetch.call(this, '/api/onboard/status/v1')
+    util.fetch.call(this, '/api/auth/status/v1')
     .then(result => { 
         this.global.onboardStatus = result.theJson.status;
         if (this.global.onboardStatus !== 'complete') {
@@ -83,14 +89,12 @@ function setup() {
 function requestAuth() {
     var tag = this.tag;
     this.loading = true;
-    util.fetch.call(this, '/api/auth/login/v1/' + tag)
+    util.fetch.call(this, '/api/auth/atlasauth/request/v1/' + tag)
     .then(result => {
         this.loading = false;
         if (result.ok) {
-            const { id } = result.theJson;
-            this.global.userId = id;
             this.global.loginTag = tag;
-            this.$router.push({ name: 'loginCode', query: this.$route.query });
+            this.$router.push({ name: 'loginAuth', params: { tag: this.tag, type: result.theJson.type }});
             return false;
         } else {
             util.addFormErrors('enter-tag', { tag: util.mergeErrors(result.theJson) });

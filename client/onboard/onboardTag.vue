@@ -4,30 +4,22 @@
 <template>
     <div class="ui main text container" style="margin-top: 80px;">
         <div class="ui container center aligned">
-            <div v-if="monitor" class="ui basic segment huge">
+            <div class="ui basic segment huge">
                 <h1>
                     <i class="circular icon add user"></i>
-                    Create Translation Bot User
+                    Create Bot User
                 </h1>
                 This bot will send and receive messages autonomously <br />
-                as a <b>new</b> Forsta user named 'translation.bot'
-                <br />
-                Please authenticate as an <b>org administrator</b> to automatically
+                as a <strong>new</strong> Forsta user you create.
+                <br /><br />
+                Please authenticate as an <strong>org administrator</strong> to
                 create this new user.
-            </div>
-            <div v-if="!monitor" class="ui basic segment huge">
-                <h1>
-                    <i class="large circular icon user"></i>
-                    Connect User
-                </h1>
-                This bot will send and receive messages autonomously <br />
-                as a particular Forsta user. Please authenticate as that user.
             </div>
             <div class="ui centered grid">
                 <div class="ui nine wide column basic segment left aligned b1">
                     <form class="ui huge form enter-tag" :class="{loading: loading}">
                         <div class="field">
-                            <label>Forsta {{monitor ? 'Organization Admin' : ''}} Login</label>
+                            <label>Forsta Organization Admin Login</label>
                             <div class="ui left icon input">
                                 <input v-focus.lazy="true" type="text" v-model='tag' name="tag" placeholder="user:org" autocomplete="off">
                                 <i class="at icon"></i>
@@ -37,10 +29,6 @@
                         <div class="ui mini error message" />
                     </form>
                 </div>
-            </div>
-            <div v-if="monitor" class="ui basic segment">
-                <p>Your administrator credentials will be immediately discarded<br />
-                and all further actions taken by this bot will be as the new user.</p>
             </div>
         </div>
     </div>
@@ -52,11 +40,11 @@ focus = require('vue-focus');
 shared = require('../globalState');
 
 function setup() {
-    util.fetch.call(this, '/api/onboard/status/v1')
+    util.fetch.call(this, '/api/auth/status/v1')
     .then(result => { 
         this.global.onboardStatus = result.theJson.status;
         if (this.global.onboardStatus === 'complete') {
-            this.$router.push(authDash);
+            this.$router.push({name: 'loginTag'});
         }
     });
 
@@ -81,7 +69,7 @@ function setup() {
 function requestAuth() {
     var tag = this.tag;
     this.loading = true;
-    util.fetch.call(this, '/api/onboard/atlasauth/request/v1/' + tag)
+    util.fetch.call(this, '/api/auth/atlasauth/request/v1/' + tag)
     .then(result => {
         this.loading = false;
         if (result.ok) {
@@ -106,7 +94,6 @@ module.exports = {
         loading: false
     }),
     computed: {
-        monitor: function () { return this.global.onboardStatus === 'authenticate-admin'; },
         gotoSetPassword: function () {
             return {
                 name: 'setPassword',

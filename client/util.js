@@ -52,7 +52,7 @@ async function _fetch(url, { method='get', headers={}, body={} }={}, noBodyAwait
 }
 
 function checkPrerequisites() {
-    _fetch.call(this, '/api/onboard/status/v1')
+    _fetch.call(this, '/api/auth/status/v1')
     .then(result => { 
         this.global.onboardStatus = result.theJson.status;
         if (this.global.onboardStatus !== 'complete') {

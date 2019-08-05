@@ -27,8 +27,8 @@ class WebServer {
         }
         this.app.use(morgan('dev')); // logging
         this.app.use(bodyParser.json());
-        this.app.use('/api/onboard/', (new api.OnboardAPIV1({server: this})).router);
         this.app.use('/api/auth/', (new api.AuthenticationAPIV1({server: this})).router);
+        this.app.use('/api/admins/', (new api.AdminsAPIV1({server: this})).router);
         this.app.use('/static/', express.static(path.join(root, 'static'), {strict: true}));
         this.app.get('/env.js', (req, res) => {
             res.setHeader('Content-Type', 'application/javascript');

@@ -3,7 +3,7 @@
 
 <template>
     <div>
-        <top-menu />
+        <top-menu v-if="global.apiToken && global.onboardStatus == 'complete'"/>
         <router-view />
         <bottom-menu />
     </div>

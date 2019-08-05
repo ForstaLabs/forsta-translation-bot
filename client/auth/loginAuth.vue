@@ -28,9 +28,9 @@
                             </div>
                         </div>
                         <button class="ui large primary submit button right floated" type="submit">Submit</button>
-                        <router-link :to="{name: 'onboardTag'}" class="ui large button secret-cancel">Cancel</router-link>
+                        <router-link :to="{name: 'loginTag'}" class="ui large button secret-cancel">Cancel</router-link>
+                        <sui-message size="small" negative v-if="error" :content="error" />
                     </form>
-                    <sui-message size="small" negative v-if="error" :content="error" />
                 </div>
             </div>
         </div>
@@ -64,13 +64,6 @@ module.exports = {
     },
     mounted: function() {
         this.type = this.$route.params.type;
-        util.fetch.call(this, '/api/auth/status/v1')
-        .then(result => { 
-            this.global.onboardStatus = result.theJson.status;
-            if (this.global.onboardStatus === 'complete') {
-                this.$router.push({name: 'loginTag'});
-            }
-        });
     },
     methods: {
         validate: function () {
@@ -93,7 +86,7 @@ module.exports = {
                 if (result.ok) {
                     const { token } = result.theJson;
                     this.global.apiToken = token;
-                    this.$router.push({ name: 'onboardComplete' });
+                    this.$router.push({ name: 'dashboard' });
                     return false;
                 } else {
                     this.error = util.mergeErrors(result.theJson) || 'Internal error, please try again.';

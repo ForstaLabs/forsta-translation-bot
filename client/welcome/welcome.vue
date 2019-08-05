@@ -53,7 +53,7 @@ module.exports = {
             this.$router.push(authDash);
             return;
         }
-        util.fetch.call(this, '/api/onboard/status/v1')
+        util.fetch.call(this, '/api/auth/status/v1')
         .then(result => { 
             this.global.onboardStatus = result.theJson.status;
             if (this.global.onboardStatus === 'complete') {

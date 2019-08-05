@@ -5,52 +5,48 @@ class BotAtlasClient extends relay.AtlasClient {
     async fetch(urn, options){
         return super.fetch(urn, options);
     }
-    static get onboardingCreatedUser() {
-        return {
-            first_name: "Translation",
-            last_name: "Bot",
-            tag_slug: "translation.bot." + Math.floor(Math.random() * 100)
-        };
-    }
 
     static get userAuthTokenDescription() {
         return 'translation bot';
     }
 
-    static async onboard(onboardClient) {
-        let botUser = await onboardClient.fetch(
+    static async onboard(onboardClient, botUserInfo) {
+        let creatorUser = await onboardClient.fetch(
             "/v1/user/" + onboardClient.userId + "/"
         );
-        const creator = `@${botUser.tag.slug}:${botUser.org.slug}`;
+        const creator = `@${creatorUser.tag.slug}:${creatorUser.org.slug}`;
         console.info(`Bot onboarding performed by: ${creator}`);
-        await relay.storage.set('authentication', 'adminIds', [botUser.id]);
-        await relay.storage.putState("onboardUser", botUser.id);
-        if (this.onboardingCreatedUser) {
-            try {
-                botUser = await onboardClient.fetch("/v1/user/", {
-                    method: "POST",
-                    json: Object.assign({}, this.onboardingCreatedUser, { phone: botUser.phone, email: botUser.email, user_type: "BOT" })
-                });
-                console.info(
-                    `Created new bot user @${botUser.tag.slug}:${botUser.org.slug} <${botUser.id}>`
-                );
-            } catch (e) {
-                console.error("error during creation of bot user", e);
-                throw e;
-            }
+        await relay.storage.set('authentication', 'adminIds', [creatorUser.id]);
+        await relay.storage.putState("onboardUser", creatorUser.id);
+        let botUser = null;
+        try {
+            botUser = await onboardClient.fetch("/v1/user/", {
+                method: "POST",
+                json: Object.assign({}, botUserInfo, { phone: creatorUser.phone, email: creatorUser.email, user_type: "BOT" })
+            });
+            console.log(botUser);
+            console.info(
+                `Created new bot user @${botUser.tag.slug}:${botUser.org.slug} <${botUser.id}>`
+            );
+            //live chat bot requires admin priveledges to retrieve ephemeral token for embed
+            const op = { method: "PATCH", json: { permissions: [ "org.administrator" ] } };
+            await onboardClient.fetch(`/v1/user/${botUser.id}/`, op);
+            const result = await onboardClient.fetch("/v1/userauthtoken/", {
+                method: "POST",
+                json: { userid: botUser.id, description: this.userAuthTokenDescription }
+            });
+            console.info(
+                `Created UserAuthToken for bot user @${botUser.tag.slug}:${
+                botUser.org.slug
+                }`
+            );
+            await relay.storage.putState("botUser", botUser.id);
+            await relay.storage.putState("botUserAuthToken", result.token);
+        } catch (e) {
+            console.log(e);
+            console.error("error during creation of bot user", e);
+            throw e;
         }
-        const result = await onboardClient.fetch("/v1/userauthtoken/", {
-            method: "POST",
-            json: { userid: botUser.id, description: this.userAuthTokenDescription }
-        });
-        console.info(
-            `Created UserAuthToken for bot user @${botUser.tag.slug}:${
-            botUser.org.slug
-            }`
-        );
-        await relay.storage.putState("botUser", botUser.id);
-        await relay.storage.putState("botUserAuthToken", result.token);
-
         const atlasClient = await this.factory();
 
         try {
