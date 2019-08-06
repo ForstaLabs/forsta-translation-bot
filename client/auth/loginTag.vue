@@ -7,7 +7,7 @@
             <div class="ui basic segment huge">
                 <h1 class="ui header">
                     <i class="circular icon user"></i>
-                    Live Chat Bot Login
+                    Translation Bot Login
                 </h1>
             </div>
             <div class="ui centered grid">
@@ -30,9 +30,6 @@
                         <div class="ui mini error message" />
                     </form>
                 </div>
-            </div>
-            <div class="ui basic segment">
-                <p>Please enter your Forsta address tag to receive login codewords for this site.</p>
             </div>
         </div>
     </div>

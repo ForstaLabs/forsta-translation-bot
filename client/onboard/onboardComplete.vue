@@ -4,12 +4,15 @@
 <template>
     <div class="ui main text container" style="margin-top: 80px;">
         <div class="ui container center aligned">
-            <div class="ui basic segment">
+            <div class="ui basic segment huge">
                 <h1>
-                    <i class="large circular sign in icon"></i>
+                    <i class="circular icon add user"></i>
                     Create Bot User
                 </h1>
-                Enter the name you would like to use for the bot
+                This bot will send and receive messages autonomously <br />
+                as a <strong>new</strong> Forsta user you create.
+                <br /><br />
+                Enter the name you would like to use for the bot.
             </div>
             <div class="ui centered grid">
                 <div class="ui nine wide column basic segment left aligned t0 b1">
