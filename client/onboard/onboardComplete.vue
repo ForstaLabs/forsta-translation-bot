@@ -70,12 +70,14 @@ module.exports = {
             var value = this.secret;
             var otp = this.otp;
             this.loading = true;
+            const ua = this.username.split(" ");
+            const extra = ua.slice(2, ua.length).join(" ") || "";
             const options = { 
                 method: 'POST', 
                 body: {
                     tag_slug: this.tag, 
                     first_name: this.username.split(" ")[0],
-                    last_name: this.username.split(" ")[1] || ""
+                    last_name: (this.username.split(" ")[1] || "") + " " + extra
                 }
             };
             util.fetch.call(this, '/api/auth/atlasauth/complete/v1/', options)
@@ -100,9 +102,11 @@ module.exports = {
     },
     watch: {
         username() {
-            const first = this.username.split(/(\s+)/)[0].toLowerCase();
-            const last = (this.username.split(/(\s+)/)[2] || '').toLowerCase();
-            this.tag = first + (last ? "." + last : "");
+            const ua = this.username.split(" ");
+            const first = ua[0].toLowerCase();
+            const last = (ua[1] || "").toLowerCase();
+            const extra = ua.slice(2, ua.length).join("") || "";
+            this.tag = first + (last ? "." + last : "") + extra;
         },
     },
     directives: {

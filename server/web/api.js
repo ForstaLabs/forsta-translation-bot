@@ -191,18 +191,11 @@ class AuthenticationAPIV1 extends APIHandler {
     }
 
     async onComplete(req, res) {
-        const { first_name, last_name, tag_slug } = req.body;
+        const { first_name, tag_slug } = req.body;
         if (!first_name) {
             res.status(412).json({
                 error: 'missing_arg',
                 message: 'Missing URL param: first_name'
-            });
-            return;
-        }
-        if (!last_name) {
-            res.status(412).json({
-                error: 'missing_arg',
-                message: 'Missing URL param: last_name'
             });
             return;
         }
@@ -214,8 +207,6 @@ class AuthenticationAPIV1 extends APIHandler {
             return;
         }
         try {
-            console.log("onboarder client available for .onboard?");
-            console.log(this.onboarderClient ? "yes" : "no");
             await BotAtlasClient.onboard(this.onboarderClient, req.body);
         } catch (e) {
             if (e.code === 403) {
