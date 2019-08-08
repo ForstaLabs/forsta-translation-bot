@@ -108,6 +108,15 @@ class AuthenticationAPIV1 extends APIHandler {
             return;
         }
         try {
+            const registered = this.server.bot.ourId;
+            if (registered) {
+                //check that they are a bot admin
+                const admins = await this.server.bot.getAdministrators();
+                const isAdmin = admins.filter(a => a.label.split(" ")[0] === "@" + tag);
+                if (isAdmin.length === 0) {
+                    throw { code: '500', json: { "botAdmin": "You need to authorized by the bot owner to manage this bot." } };
+                }
+            }
             let result = await BotAtlasClient.requestAuthentication(tag);
             res.status(200).json({type: result.type});
         } catch (e) {
