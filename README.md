@@ -1,7 +1,7 @@
 Forsta Translation Bot
 ========
 
-This repository is built from Forsta's [end-to-end-encrypted messaging bot template](https://github.com/ForstaLabs/messaging-bot).
+This repository is built from Forsta's [end-to-end-encrypted messaging bot template](https://github.com/ForstaLabs/forsta-messaging-bot).
 The Forsta messaging-bot provides for for autonomous receipt, processing, storage, and
 transmission of messaging data in conjunction with the Forsta web messenger and iPhone/Android apps.
 Please fork it or one of our several projects based off of it!
@@ -26,7 +26,7 @@ with the appropriate translations.
 
 Quick Start 
 --------
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ForstaLabs/translation-bot)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/ForstaLabs/forsta-translation-bot)
 
 
 Install Requirements
@@ -41,7 +41,7 @@ Install Requirements
 Developer Install
 --------
 ```
-git clone https://github.com/ForstaLabs/translation-bot.git
+git clone https://github.com/ForstaLabs/forsta-translation-bot.git
 cd translation-bot
 ```
 Create a file named .env with the following values:

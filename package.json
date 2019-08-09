@@ -5,7 +5,7 @@
   "engines": {
     "node": "8"
   },
-  "repository": "ForstaLabs/translation-bot",
+  "repository": "ForstaLabs/forsta-translation-bot",
   "keywords": [
     "forsta",
     "e-discovery",
@@ -13,9 +13,9 @@
   ],
   "license": "GPL-3.0",
   "bugs": {
-    "url": "https://github.com/ForstaLabs/translation-bot/issues"
+    "url": "https://github.com/ForstaLabs/forsta-translation-bot/issues"
   },
-  "homepage": "https://github.com/ForstaLabs/translation-bot#readme",
+  "homepage": "https://github.com/ForstaLabs/forsta-translation-bot#readme",
   "scripts": {
     "postinstall": "SKIP_PACKAGES=1 make",
     "start": "node server"

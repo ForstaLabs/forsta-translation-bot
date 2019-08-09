@@ -1,8 +1,8 @@
 {
     "name": "Forsta Translation Bot",
     "description": "A Forsta bot that translates messages into different languages.",
-    "repository": "https://github.com/ForstaLabs/translation-bot.git",
-    "logo": "https://raw.githubusercontent.com/ForstaLabs/translation-bot/master/images/forsta-logo.svg?sanitize=true",
+    "repository": "https://github.com/ForstaLabs/forsta-translation-bot.git",
+    "logo": "https://raw.githubusercontent.com/ForstaLabs/forsta-translation-bot/master/images/forsta-logo.svg?sanitize=true",
     "keywords": ["forsta", "messaging", "bot", "translation", "monitor"],
     "website": "https://forsta.io",
     "addons": ["heroku-redis"],
