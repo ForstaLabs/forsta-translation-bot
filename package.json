@@ -43,13 +43,13 @@
     "grunt-env": "^0.4.4",
     "heroku-ssl-redirect": "0.0.4",
     "iso-language-converter": "^1.1.0",
-    "jquery": "3.2.1",
+    "jquery": "3.4.0",
     "jsonwebtoken": "^8.1.0",
     "jwt-decode": "^2.2.0",
     "librelay": "4.5.0",
     "lodash": "^4.17.4",
     "moment": "^2.20.1",
-    "morgan": "1.9.0",
+    "morgan": "1.9.1",
     "semantic-ui": "2.3.0",
     "semantic-ui-vue": "^0.2.10",
     "swearjar": "^0.2.0",
@@ -60,7 +60,7 @@
     "vueify": "^9.4.1"
   },
   "devDependencies": {
-    "eslint": "4.12.1",
+    "eslint": "4.18.2",
     "grunt-contrib-watch": "1.0.0"
   }
 }
