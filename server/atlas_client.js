@@ -29,8 +29,6 @@ class BotAtlasClient extends relay.AtlasClient {
                 `Created new bot user @${botUser.tag.slug}:${botUser.org.slug} <${botUser.id}>`
             );
             //live chat bot requires admin priveledges to retrieve ephemeral token for embed
-            const op = { method: "PATCH", json: { permissions: [ "org.administrator" ] } };
-            await onboardClient.fetch(`/v1/user/${botUser.id}/`, op);
             const result = await onboardClient.fetch("/v1/userauthtoken/", {
                 method: "POST",
                 json: { userid: botUser.id, description: this.userAuthTokenDescription }
